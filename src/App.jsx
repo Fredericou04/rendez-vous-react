@@ -57,7 +57,7 @@ export default function App() {
         const [nom, phone, def] = info.event.title.split(" | ");
         const eventRef = ref(db, 'rendezvous/' + info.event.id);
         set(eventRef, {
-          title: \`\${nom} | \${phone} | \${def}\`,
+          title: nom + " | " + phone + " | " + def,
           start: info.event.start.toISOString()
         });
       },
