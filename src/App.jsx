@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, onValue, push, set, remove } from "firebase/database";
@@ -26,6 +25,7 @@ export default function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [eventData, setEventData] = useState(null);
   const [calendar, setCalendar] = useState(null);
+  const [showWeekends, setShowWeekends] = useState(true);
 
   useEffect(() => {
     const calendarEl = calendarRef.current;
@@ -36,7 +36,8 @@ export default function App() {
       selectable: true,
       locale: frLocale,
       slotMinTime: "07:00:00",
-      slotMaxTime: "22:00:00",
+      slotMaxTime: "23:00:00",
+      weekends: showWeekends,
       headerToolbar: {
         left: 'prev,next today',
         center: 'title',
@@ -85,6 +86,13 @@ export default function App() {
     cal.render();
   }, []);
 
+  const toggleWeekends = () => {
+    if (calendar) {
+      calendar.setOption("weekends", !showWeekends);
+      setShowWeekends(!showWeekends);
+    }
+  };
+
   const handleSave = (data) => {
     const fullTitle = data.title + " | " + data.phone + " | " + data.def;
     if (data.id) {
@@ -114,6 +122,9 @@ export default function App() {
   return (
     <div style={{ padding: "20px" }}>
       <h1 style={{ color: "#b70000", fontWeight: "bold" }}>Calendrier de rendez-vous</h1>
+      <button onClick={toggleWeekends} style={{ marginBottom: "10px" }}>
+        {showWeekends ? "Masquer le samedi/dimanche" : "Afficher le samedi/dimanche"}
+      </button>
       <div ref={calendarRef}></div>
       {modalOpen && (
         <EditModal
