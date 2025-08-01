@@ -35,6 +35,8 @@ export default function App() {
       editable: true,
       selectable: true,
       locale: frLocale,
+      slotMinTime: "07:00:00",
+      slotMaxTime: "22:00:00",
       headerToolbar: {
         left: 'prev,next today',
         center: 'title',
