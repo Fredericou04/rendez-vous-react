@@ -18,7 +18,7 @@ export default function EditModal({ data, onSave, onCancel, onDelete }) {
         <label>Nom du client :</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} required />
         <label>Numéro de téléphone :</label>
-        <input value={phone} onChange={(e) => setPhone(e.target.value)} required />
+        <input value={phone} onChange={(e) => setPhone(e.target.value)} />
         <label>Défectuosités :</label>
         <textarea value={def} onChange={(e) => setDef(e.target.value)} />
         <div style={{ marginTop: "10px" }}>
