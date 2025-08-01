@@ -26,9 +26,21 @@ export default function App() {
   const [eventData, setEventData] = useState(null);
   const [calendar, setCalendar] = useState(null);
   const [showWeekends, setShowWeekends] = useState(true);
+  const [activeDept, setActiveDept] = useState("mecanique");
+
+  const getDbPath = () => activeDept === "mecanique" ? "rendezvous_mecanique" : "rendezvous_inspection";
 
   useEffect(() => {
+    if (!calendarRef.current) return;
+    renderCalendar();
+  }, [activeDept]);
+
+  const renderCalendar = () => {
     const calendarEl = calendarRef.current;
+    if (calendar) {
+      calendar.destroy();
+    }
+
     const cal = new Calendar(calendarEl, {
       plugins: [timeGridPlugin, interactionPlugin],
       initialView: 'timeGridDay',
@@ -36,7 +48,7 @@ export default function App() {
       selectable: true,
       locale: frLocale,
       slotMinTime: "07:00:00",
-      slotMaxTime: "23:00:00",
+      slotMaxTime: "22:00:00",
       weekends: showWeekends,
       headerToolbar: {
         left: 'prev,next today',
@@ -60,7 +72,7 @@ export default function App() {
       },
       eventDrop: function(info) {
         const [nom, phone, def] = info.event.title.split(" | ");
-        const eventRef = ref(db, 'rendezvous/' + info.event.id);
+        const eventRef = ref(db, getDbPath() + '/' + info.event.id);
         set(eventRef, {
           title: nom + " | " + phone + " | " + def,
           start: info.event.start.toISOString()
@@ -70,7 +82,7 @@ export default function App() {
     });
     setCalendar(cal);
 
-    const calendarDbRef = ref(db, 'rendezvous');
+    const calendarDbRef = ref(db, getDbPath());
     onValue(calendarDbRef, (snapshot) => {
       const data = snapshot.val();
       cal.removeAllEvents();
@@ -84,7 +96,7 @@ export default function App() {
     });
 
     cal.render();
-  }, []);
+  };
 
   const toggleWeekends = () => {
     if (calendar) {
@@ -95,14 +107,16 @@ export default function App() {
 
   const handleSave = (data) => {
     const fullTitle = data.title + " | " + data.phone + " | " + data.def;
+    const dbPath = getDbPath();
+
     if (data.id) {
-      const eventRef = ref(db, 'rendezvous/' + data.id);
+      const eventRef = ref(db, dbPath + '/' + data.id);
       set(eventRef, {
         title: fullTitle,
         start: data.start
       });
     } else {
-      const newEventRef = push(ref(db, 'rendezvous'));
+      const newEventRef = push(ref(db, dbPath));
       set(newEventRef, {
         title: fullTitle,
         start: data.start
@@ -113,7 +127,7 @@ export default function App() {
 
   const handleDelete = (id) => {
     if (window.confirm("Supprimer ce rendez-vous ?")) {
-      const eventRef = ref(db, 'rendezvous/' + id);
+      const eventRef = ref(db, getDbPath() + '/' + id);
       remove(eventRef);
       setModalOpen(false);
     }
@@ -122,9 +136,17 @@ export default function App() {
   return (
     <div style={{ padding: "20px" }}>
       <h1 style={{ color: "#b70000", fontWeight: "bold" }}>Calendrier de rendez-vous</h1>
-      <button onClick={toggleWeekends} style={{ marginBottom: "10px" }}>
-        {showWeekends ? "Masquer le samedi/dimanche" : "Afficher le samedi/dimanche"}
-      </button>
+      <div style={{ marginBottom: "10px" }}>
+        <button onClick={() => setActiveDept("mecanique")} disabled={activeDept === "mecanique"}>
+          Département Mécanique
+        </button>
+        <button onClick={() => setActiveDept("inspection")} disabled={activeDept === "inspection"} style={{ marginLeft: "10px" }}>
+          Département Inspection
+        </button>
+        <button onClick={toggleWeekends} style={{ marginLeft: "10px" }}>
+          {showWeekends ? "Masquer le samedi/dimanche" : "Afficher le samedi/dimanche"}
+        </button>
+      </div>
       <div ref={calendarRef}></div>
       {modalOpen && (
         <EditModal
