@@ -5,7 +5,6 @@ import { getDatabase, ref, onValue, push, set, remove } from "firebase/database"
 import { Calendar } from '@fullcalendar/core';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import '@fullcalendar/core/index.css';
 import '@fullcalendar/timegrid/index.css';
 
 const firebaseConfig = {
