@@ -56,17 +56,23 @@ export default function App() {
         right: 'timeGridDay,timeGridWeek'
       },
       dateClick: function(info) {
-        setEventData({ id: null, start: info.dateStr, title: "", phone: "", def: "" });
+        const isAllDayClick = info.allDay || info.jsEvent?.target?.closest('.fc-daygrid-day-frame');
+        if (isAllDayClick) {
+          setEventData({ id: null, start: info.dateStr, title: "", phone: "", def: "", allDay: true });
+        } else {
+          setEventData({ id: null, start: info.dateStr, title: "", phone: "", def: "", allDay: false });
+        }
         setModalOpen(true);
       },
       eventClick: function(info) {
         const [nom, phone, def] = info.event.title.split(" | ");
         setEventData({
           id: info.event.id,
-          start: info.event.start.toISOString(),
+          start: info.event.startStr,
           title: nom || "",
           phone: phone || "",
-          def: def || ""
+          def: def || "",
+          allDay: info.event.allDay
         });
         setModalOpen(true);
       },
@@ -75,8 +81,16 @@ export default function App() {
         const eventRef = ref(db, getDbPath() + '/' + info.event.id);
         set(eventRef, {
           title: nom + " | " + phone + " | " + def,
-          start: info.event.start.toISOString()
+          start: info.event.startStr,
+          allDay: info.event.allDay || false
         });
+      },
+      eventDidMount: function(info) {
+        if (info.event.allDay) {
+          info.el.style.backgroundColor = "#fff6cc";
+          info.el.style.border = "1px solid #e6d400";
+          info.el.style.color = "#000";
+        }
       },
       events: []
     });
@@ -90,7 +104,8 @@ export default function App() {
         cal.addEvent({
           id,
           title: data[id].title,
-          start: data[id].start
+          start: data[id].start,
+          allDay: data[id].allDay || false
         });
       }
     });
@@ -109,18 +124,18 @@ export default function App() {
     const fullTitle = data.title + " | " + data.phone + " | " + data.def;
     const dbPath = getDbPath();
 
+    const record = {
+      title: fullTitle,
+      start: data.start,
+      allDay: data.allDay || false
+    };
+
     if (data.id) {
       const eventRef = ref(db, dbPath + '/' + data.id);
-      set(eventRef, {
-        title: fullTitle,
-        start: data.start
-      });
+      set(eventRef, record);
     } else {
       const newEventRef = push(ref(db, dbPath));
-      set(newEventRef, {
-        title: fullTitle,
-        start: data.start
-      });
+      set(newEventRef, record);
     }
     setModalOpen(false);
   };
