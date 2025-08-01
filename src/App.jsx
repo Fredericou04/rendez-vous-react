@@ -5,6 +5,7 @@ import { getDatabase, ref, onValue, push, set, remove } from "firebase/database"
 import { Calendar } from '@fullcalendar/core';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import frLocale from '@fullcalendar/core/locales/fr';
 import EditModal from './EditModal';
 
 const firebaseConfig = {
@@ -33,6 +34,7 @@ export default function App() {
       initialView: 'timeGridDay',
       editable: true,
       selectable: true,
+      locale: frLocale,
       headerToolbar: {
         left: 'prev,next today',
         center: 'title',
