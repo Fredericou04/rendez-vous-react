@@ -82,7 +82,7 @@ export default function App() {
   }, []);
 
   const handleSave = (data) => {
-    const fullTitle = \`\${data.title} | \${data.phone} | \${data.def}\`;
+    const fullTitle = data.title + " | " + data.phone + " | " + data.def;
     if (data.id) {
       const eventRef = ref(db, 'rendezvous/' + data.id);
       set(eventRef, {
