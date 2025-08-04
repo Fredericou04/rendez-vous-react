@@ -60,7 +60,7 @@ export default function App() {
         const currentView = calendar?.view?.type;
         if (currentView === "dayGridMonth") {
           calendar.changeView('timeGridDay', info.dateStr);
-          return; // ✅ stop ici pour bloquer l'ouverture du modal
+          return; // arrêter ici pour éviter le modal
         }
 
         const isAllDayClick = info.allDay || info.jsEvent?.target?.closest('.fc-daygrid-day-frame');
