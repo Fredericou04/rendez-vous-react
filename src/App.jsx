@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, onValue, push, set, remove } from "firebase/database";
@@ -58,11 +57,15 @@ export default function App() {
       },
       dateClick: function(info) {
         const isAllDayClick = info.allDay || info.jsEvent?.target?.closest('.fc-daygrid-day-frame');
-        if (isAllDayClick) {
-          setEventData({ id: null, start: info.dateStr, title: "", phone: "", def: "", allDay: true });
-        } else {
-          setEventData({ id: null, start: info.dateStr, title: "", phone: "", def: "", allDay: false });
-        }
+        setEventData({
+          id: null,
+          start: info.dateStr,
+          title: "",
+          phone: "",
+          def: "",
+          allDay: isAllDayClick,
+          draggable: false
+        });
         setModalOpen(true);
       },
       eventClick: function(info) {
@@ -73,7 +76,8 @@ export default function App() {
           title: nom || "",
           phone: phone || "",
           def: def || "",
-          allDay: info.event.allDay
+          allDay: info.event.allDay,
+          draggable: info.event.extendedProps.draggable ?? false
         });
         setModalOpen(true);
       },
@@ -83,7 +87,8 @@ export default function App() {
         set(eventRef, {
           title: nom + " | " + phone + " | " + def,
           start: info.event.startStr,
-          allDay: info.event.allDay || false
+          allDay: info.event.allDay || false,
+          draggable: info.event.extendedProps.draggable ?? false
         });
       },
       eventDidMount: function(info) {
@@ -92,6 +97,12 @@ export default function App() {
           info.el.style.border = "1px solid #e6d400";
           info.el.style.color = "#000";
         }
+        if (!info.event.extendedProps.draggable && !info.event.allDay) {
+          info.el.draggable = false;
+        }
+      },
+      eventAllow: function(dropInfo, draggedEvent) {
+        return draggedEvent.extendedProps.draggable ?? false;
       },
       events: []
     });
@@ -106,7 +117,10 @@ export default function App() {
           id,
           title: data[id].title,
           start: data[id].start,
-          allDay: data[id].allDay || false
+          allDay: data[id].allDay || false,
+          extendedProps: {
+            draggable: data[id].draggable ?? false
+          }
         });
       }
     });
@@ -128,7 +142,8 @@ export default function App() {
     const record = {
       title: fullTitle,
       start: data.start,
-      allDay: data.allDay || false
+      allDay: data.allDay || false,
+      draggable: data.draggable ?? false
     };
 
     if (data.id) {
@@ -174,4 +189,4 @@ export default function App() {
       )}
     </div>
   );
-} 
+}
