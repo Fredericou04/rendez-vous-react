@@ -122,12 +122,18 @@ function App() {
         slotMaxTime="22:00:00"
         selectable={true}
         editable={true}
+        headerToolbar={{
+          left: "prev,next today",
+          center: "title",
+          right: "dayGridMonth,timeGridWeek,timeGridDay"
+        }}
         events={events}
         dateClick={handleDateClick}
         eventClick={handleEventClick}
         eventDidMount={(info) => {
           if (info.event.allDay) {
             info.el.classList.add("note-jour");
+            info.el.style.color = "black";
           }
           if (
             calendarRef.current.getApi().view.type === "dayGridMonth" &&
