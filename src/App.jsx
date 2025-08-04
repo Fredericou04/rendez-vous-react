@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getDatabase, ref, onValue, push, set, remove } from "firebase/database";
 import { Calendar } from '@fullcalendar/core';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import frLocale from '@fullcalendar/core/locales/fr';
 import EditModal from './EditModal';
@@ -42,7 +43,7 @@ export default function App() {
     }
 
     const cal = new Calendar(calendarEl, {
-      plugins: [timeGridPlugin, interactionPlugin],
+      plugins: [timeGridPlugin, dayGridPlugin, interactionPlugin],
       initialView: 'timeGridDay',
       editable: true,
       selectable: true,
@@ -53,9 +54,14 @@ export default function App() {
       headerToolbar: {
         left: 'prev,next today',
         center: 'title',
-        right: 'timeGridDay,timeGridWeek'
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
       },
       dateClick: function(info) {
+        if (calendar.view.type === "dayGridMonth") {
+          calendar.changeView('timeGridDay', info.dateStr);
+          return;
+        }
+
         const isAllDayClick = info.allDay || info.jsEvent?.target?.closest('.fc-daygrid-day-frame');
         setEventData({
           id: null,
