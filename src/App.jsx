@@ -69,8 +69,7 @@ export default function App() {
             def: "",
             allDay: isAllDayClick,
             draggable: false
-                  });
-      }
+          });
           setModalOpen(true);
         }
       },
@@ -84,8 +83,7 @@ export default function App() {
           def: def || "",
           allDay: info.event.allDay,
           draggable: info.event.extendedProps.draggable ?? false
-                });
-      }
+        });
         setModalOpen(true);
       },
       eventDrop: function(info) {
@@ -96,8 +94,7 @@ export default function App() {
           start: info.event.startStr,
           allDay: info.event.allDay || false,
           draggable: info.event.extendedProps.draggable ?? false
-                });
-      }
+        });
       },
       eventDidMount: function(info) {
         if (info.event.allDay) {
@@ -113,8 +110,8 @@ export default function App() {
         return draggedEvent.extendedProps.draggable ?? false;
       },
       events: []
-            });
-      }
+    });
+
     setCalendar(cal);
 
     const calendarDbRef = ref(db, getDbPath());
@@ -122,8 +119,7 @@ export default function App() {
       const data = snapshot.val();
       cal.removeAllEvents();
       for (let id in data) {
-        if (!(cal.view.type === 'dayGridMonth') || data[id].allDay) {
-        cal.addEvent({
+        const evt = {
           id,
           title: data[id].title,
           start: data[id].start,
@@ -131,11 +127,17 @@ export default function App() {
           extendedProps: {
             draggable: data[id].draggable ?? false
           }
-                });
+        };
+        // Afficher uniquement les événements allDay dans la vue du mois
+        if (cal.view?.type === 'dayGridMonth') {
+          if (evt.allDay) {
+            cal.addEvent(evt);
+          }
+        } else {
+          cal.addEvent(evt);
+        }
       }
-      }
-            });
-      }
+    });
 
     cal.render();
   };
