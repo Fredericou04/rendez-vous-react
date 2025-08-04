@@ -59,20 +59,20 @@ export default function App() {
       dateClick: function(info) {
         if (calendar.view.type === "dayGridMonth") {
           calendar.changeView('timeGridDay', info.dateStr);
-          return;
+        } else {
+          const isAllDayClick = info.allDay || info.jsEvent?.target?.closest('.fc-daygrid-day-frame');
+          setEventData({
+            id: null,
+            start: info.dateStr,
+            title: "",
+            phone: "",
+            def: "",
+            allDay: isAllDayClick,
+            draggable: false
+                  });
+      }
+          setModalOpen(true);
         }
-
-        const isAllDayClick = info.allDay || info.jsEvent?.target?.closest('.fc-daygrid-day-frame');
-        setEventData({
-          id: null,
-          start: info.dateStr,
-          title: "",
-          phone: "",
-          def: "",
-          allDay: isAllDayClick,
-          draggable: false
-        });
-        setModalOpen(true);
       },
       eventClick: function(info) {
         const [nom, phone, def] = info.event.title.split(" | ");
@@ -84,7 +84,8 @@ export default function App() {
           def: def || "",
           allDay: info.event.allDay,
           draggable: info.event.extendedProps.draggable ?? false
-        });
+                });
+      }
         setModalOpen(true);
       },
       eventDrop: function(info) {
@@ -95,7 +96,8 @@ export default function App() {
           start: info.event.startStr,
           allDay: info.event.allDay || false,
           draggable: info.event.extendedProps.draggable ?? false
-        });
+                });
+      }
       },
       eventDidMount: function(info) {
         if (info.event.allDay) {
@@ -111,7 +113,8 @@ export default function App() {
         return draggedEvent.extendedProps.draggable ?? false;
       },
       events: []
-    });
+            });
+      }
     setCalendar(cal);
 
     const calendarDbRef = ref(db, getDbPath());
@@ -119,6 +122,7 @@ export default function App() {
       const data = snapshot.val();
       cal.removeAllEvents();
       for (let id in data) {
+        if (!(cal.view.type === 'dayGridMonth') || data[id].allDay) {
         cal.addEvent({
           id,
           title: data[id].title,
@@ -127,9 +131,11 @@ export default function App() {
           extendedProps: {
             draggable: data[id].draggable ?? false
           }
-        });
+                });
       }
-    });
+      }
+            });
+      }
 
     cal.render();
   };
