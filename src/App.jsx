@@ -57,7 +57,8 @@ export default function App() {
         right: 'dayGridMonth,timeGridWeek,timeGridDay'
       },
       dateClick: function(info) {
-        if (calendar.view.type === "dayGridMonth") {
+        const currentView = calendar?.view?.type;
+        if (currentView === "dayGridMonth") {
           calendar.changeView('timeGridDay', info.dateStr);
           return; // arrêter ici pour éviter le modal
         }
@@ -102,7 +103,7 @@ export default function App() {
         if (info.event.allDay) {
           info.el.style.backgroundColor = "#fff6cc";
           info.el.style.border = "1px solid #e6d400";
-          info.el.style.color = "#000";
+          info.el.style.color = "#000"; // Texte en noir pour les notes
         }
         if (!info.event.extendedProps.draggable && !info.event.allDay) {
           info.el.draggable = false;
@@ -121,6 +122,7 @@ export default function App() {
 
     // Corriger comportement: clic sur une journée en mode mois pour ouvrir la vue jour
     cal.on('dateClick', function(info) {
+      if (cal && cal.view?.type === 'dayGridMonth') { cal.changeView('timeGridDay', info.dateStr); return; }
       if (cal.view.type === 'dayGridMonth') {
         cal.changeView('timeGridDay', info.dateStr);
       }
