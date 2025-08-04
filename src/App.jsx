@@ -59,19 +59,20 @@ export default function App() {
       dateClick: function(info) {
         if (calendar.view.type === "dayGridMonth") {
           calendar.changeView('timeGridDay', info.dateStr);
-        } else {
-          const isAllDayClick = info.allDay || info.jsEvent?.target?.closest('.fc-daygrid-day-frame');
-          setEventData({
-            id: null,
-            start: info.dateStr,
-            title: "",
-            phone: "",
-            def: "",
-            allDay: isAllDayClick,
-            draggable: false
-          });
-          setModalOpen(true);
+          return; // empêcher l'ouverture du modal
         }
+
+        const isAllDayClick = info.allDay || info.jsEvent?.target?.closest('.fc-daygrid-day-frame');
+        setEventData({
+          id: null,
+          start: info.dateStr,
+          title: "",
+          phone: "",
+          def: "",
+          allDay: isAllDayClick,
+          draggable: false
+        });
+        setModalOpen(true);
       },
       eventClick: function(info) {
         const [nom, phone, def] = info.event.title.split(" | ");
