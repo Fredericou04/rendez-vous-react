@@ -75,6 +75,7 @@ export default function App() {
         setModalOpen(true);
       },
       eventClick: function(info) {
+        if (calendar.view.type === "dayGridMonth") return;
         const [nom, phone, def] = info.event.title.split(" | ");
         setEventData({
           id: info.event.id,
@@ -115,7 +116,16 @@ export default function App() {
 
     setCalendar(cal);
 
+    
     const calendarDbRef = ref(db, getDbPath());
+
+    // Corriger comportement: clic sur une journée en mode mois pour ouvrir la vue jour
+    cal.on('dateClick', function(info) {
+      if (cal.view.type === 'dayGridMonth') {
+        cal.changeView('timeGridDay', info.dateStr);
+      }
+    });
+
     onValue(calendarDbRef, (snapshot) => {
       const data = snapshot.val();
       cal.removeAllEvents();
