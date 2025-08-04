@@ -44,7 +44,7 @@ export default function App() {
 
     const cal = new Calendar(calendarEl, {
       plugins: [timeGridPlugin, dayGridPlugin, interactionPlugin],
-      initialView: 'timeGridDay',
+      initialView: 'dayGridMonth',
       editable: true,
       selectable: true,
       locale: frLocale,
